@@ -58,7 +58,7 @@ export const userController = {
         const { email } = req.params;
         try {
             await businessLogic.deleteUser(email);
-            res.status(204).send();
+            res.status(200).send({ message: 'User deleted successfully' });
         } catch (error: any) {
             res.status(error.status || 500).send({ error: error.message || "Failed to delete user" });
         }

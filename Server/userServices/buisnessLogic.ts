@@ -1,9 +1,13 @@
+import jwt, { Secret } from 'jsonwebtoken';
 import { client } from "../DBConnection/mongoDB/mongoConnection";
 import { User } from "../interfaces/userInterfaces/userInterface";
 import { userSchema } from "../serializers/userSerializer";
+require('dotenv').config();
+
 
 export class UserBusinessLogic {
   private db: any;
+  private JWT_SECRET = process.env.JWT_SECRET || 'default-secret'; 
 
   constructor() {
     this.initializeDB();
@@ -19,11 +23,10 @@ export class UserBusinessLogic {
       throw error;
     }
   }
-// CREATE USER
-  addUser = async (user: User): Promise<User> => {
-    const existingUser = await this.db
-      .collection("users")
-      .findOne({ email: user.email });
+
+  //REGISTRATION
+  registerUser = async (user: User): Promise<string> => {
+    const existingUser = await this.db.collection("users").findOne({ email: user.email });
     if (existingUser) {
       throw { message: "User already exists", status: 400 };
     }
@@ -32,20 +35,36 @@ export class UserBusinessLogic {
       throw { message: validationResult.error.message, status: 400 };
     }
     await this.db.collection("users").insertOne(user);
-    return user;
+    const token = this.generateToken(user.email);
+    return token;
   };
 
-// GET ALL USERS
+  // LOGIN USER
+  loginUser = async (email: string, password: string): Promise<string | null> => {
+    const user = await this.db.collection("users").findOne({ email });
+    if (!user || user.password !== password) {
+      throw { message: "Invalid email or password", status: 401 };
+    }
+    const token = this.generateToken(email);
+    return token;
+  };
+
+  // GET ALL USERS
   getAllUsers = async (): Promise<User[]> => {
     const users = await this.db.collection("users").find().toArray();
     return users;
   };
 
-// UPDATE USER
-  updateUser = async (
-    email: string,
-    updatedUser: User
-  ): Promise<User | null> => {
+  // GET USER BY EMAIL
+  private async getUserByEmail(email: string): Promise<User | null> {
+    if (!this.db) {
+      throw new Error("Database connection not established");
+    }
+    return await this.db.collection("users").findOne({ email });
+  }
+
+  // UPDATE USER
+  updateUser = async (email: string, updatedUser: User): Promise<User | null> => {
     const existingUser = await this.getUserByEmail(email);
     if (!existingUser) {
       return null;
@@ -54,13 +73,11 @@ export class UserBusinessLogic {
     if (validationResult.error) {
       throw { message: validationResult.error.message, status: 400 };
     }
-    await this.db
-      .collection("users")
-      .updateOne({ email }, { $set: updatedUser });
+    await this.db.collection("users").updateOne({ email }, { $set: updatedUser });
     return updatedUser;
   };
 
-//   DELETE USER
+  // DELETE USER
   deleteUser = async (email: string): Promise<void> => {
     const existingUser = await this.getUserByEmail(email);
     if (!existingUser) {
@@ -69,10 +86,11 @@ export class UserBusinessLogic {
     await this.db.collection("users").deleteOne({ email });
   };
 
-  private async getUserByEmail(email: string): Promise<User | null> {
-    if (!this.db) {
-      throw new Error("Database connection not established");
+  // Token generation
+  private generateToken(email: string): string {
+    if (!this.JWT_SECRET) {
+        throw new Error('JWT secret key is not defined');
     }
-    return await this.db.collection("users").findOne({ email });
-  }
+    return jwt.sign({ email }, this.JWT_SECRET as Secret, { expiresIn: '5m' });
+}
 }

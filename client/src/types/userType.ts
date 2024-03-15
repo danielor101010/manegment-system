@@ -1,5 +1,6 @@
 
 interface User {
+    avatar: string | undefined;
     username: string;
     email: string;
     password: string;

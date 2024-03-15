@@ -1,8 +1,12 @@
 import React from 'react'
+import Card from '../../components/card/card'
+import BaseLayout from '../../baseLayout/BaseLayout'
 
 function AdminDahsboard() {
   return (
-    <div>AdminDahsboard</div>
+    <BaseLayout>
+    <Card/>
+    </BaseLayout>
   )
 }
 

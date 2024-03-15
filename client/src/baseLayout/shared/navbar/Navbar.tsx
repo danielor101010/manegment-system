@@ -15,46 +15,23 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Button from "@mui/material/Button";
 import { darkTheme } from "../../../themes/Themes";
-
-interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * You won't need it on your project.
-   */
-  window?: () => Window;
-}
+import { Page } from "../../types";
+import { useNavigate } from "react-router-dom";
+import { NavbarProps } from "./types";
 
 const drawerWidth = 240;
-const navItems = ["Home", "About", "Contact"];
 
-export default function DrawerAppBar(props: Props) {
-  const { window } = props;
+export default function Navbar({ pages }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const navigation = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
-  const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        MUI
-      </Typography>
-      <Divider />
-      <List>
-        {navItems.map((item) => (
-          <ListItem key={item} disablePadding>
-            <ListItemButton sx={{ textAlign: "center" }}>
-              <ListItemText primary={item} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  const handleNavigation = (page: string) => () => {
+    navigation(page);
+  };
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -76,12 +53,16 @@ export default function DrawerAppBar(props: Props) {
               component="div"
               sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
             >
-              MUI
+              JULIUS
             </Typography>
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
-              {navItems.map((item) => (
-                <Button key={item} sx={{ color: "#fff" }}>
-                  {item}
+              {pages.map((page) => (
+                <Button
+                  key={page.name}
+                  onClick={handleNavigation(page.path)}
+                  sx={{ color: "#fff" }}
+                >
+                  {page.name}
                 </Button>
               ))}
             </Box>
@@ -89,7 +70,6 @@ export default function DrawerAppBar(props: Props) {
         </AppBar>
         <nav>
           <Drawer
-            container={container}
             variant="temporary"
             open={mobileOpen}
             onClose={handleDrawerToggle}
@@ -98,10 +78,30 @@ export default function DrawerAppBar(props: Props) {
             }}
             sx={{
               display: { xs: "block", sm: "none" },
-              "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+              },
             }}
           >
-            {drawer}
+            <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+              <Typography variant="h6" sx={{ my: 2 }}>
+                MUI
+              </Typography>
+              <Divider />
+              <List>
+                {pages.map((page) => (
+                  <ListItem key={page.name} disablePadding>
+                    <ListItemButton
+                      onClick={handleNavigation(page.path)}
+                      sx={{ textAlign: "center" }}
+                    >
+                      <ListItemText primary={page.name} />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
           </Drawer>
         </nav>
         <Box component="main" sx={{ p: 3 }}>

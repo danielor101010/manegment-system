@@ -10,18 +10,37 @@ import Container from '@mui/material/Container';
 import { ThemeProvider } from '@mui/material/styles';
 import Copyrights from '../../components/copyrights/Copyrights';
 import { darkTheme } from '../../themes/Themes';
+import { useLogin } from '../../hooks/queries/userHookes';
+import { LoginData } from './types';
+import { useNavigate } from 'react-router-dom';
+import { Axios, AxiosError } from 'axios';
 
 
 
 export default function Login() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    const navigate = useNavigate();
+
+    const { mutate, isLoading, isError } = useLogin();
+  
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
+
+      const data: LoginData = {
+          email: formData.get('email') as string,
+          password: formData.get('password') as string,
+         
+      };
+  
+        mutate(data,{
+          onSuccess: (data:LoginData): void =>{
+            navigate('/adminDashboard')
+          },
+          onError: (error: AxiosError): void => {
+            alert("Incorrect email or password");
+          }
+        });
+    };
 
   return (
     <ThemeProvider theme={darkTheme}>

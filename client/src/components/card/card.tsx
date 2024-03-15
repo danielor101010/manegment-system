@@ -25,7 +25,7 @@ function CardComponent({ user }: CardProps) {
                     title={user.username} 
                 />
                 <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
+                    <Typography gutterBottom variant="h5" component="div">Name: 
                         {user.username}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">

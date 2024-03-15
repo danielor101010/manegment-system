@@ -25,7 +25,7 @@ export class UserBusinessLogic {
   }
 
   //REGISTRATION
-  registerUser = async (user: User): Promise<string> => {
+  userRegister = async (user: User): Promise<string> => {
     const existingUser = await this.db.collection("users").findOne({ email: user.email });
     if (existingUser) {
       throw { message: "User already exists", status: 400 };

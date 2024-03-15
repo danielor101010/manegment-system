@@ -7,6 +7,7 @@ interface User {
     phone: string;
     address: string;
     city: string;
+    isAdmin?: boolean;
   }
   
   export default User;

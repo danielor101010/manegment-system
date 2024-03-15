@@ -3,9 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -14,20 +11,35 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Copyrights from '../../components/copyrights/Copyrights';
 import { darkTheme } from '../../themes/Themes';
+import { useRegister } from '../../hooks/queries/userHookes';
+import User from '../../types/userType';
 
 
-
-const defaultTheme = createTheme();
 
 export default function Register() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    const { mutate, isLoading, isError } = useRegister();
+  
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
+
+      const data: User = {
+          username: formData.get('username') as string,
+          email: formData.get('email') as string,
+          password: formData.get('password') as string,
+          phone: formData.get('phone') as string,
+          address: formData.get('address') as string,
+          city: formData.get('city') as string,
+          avatar: undefined
+      };
+  
+      try {
+        await mutate(data);
+        alert('success')
+      } catch (error) {
+        alert(error)
+    }
+    };
 
   return (
     <ThemeProvider theme={darkTheme}>

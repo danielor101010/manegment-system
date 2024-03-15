@@ -1,15 +1,17 @@
 import { Request, Response } from "express";
 import { User } from "../interfaces/userInterfaces/userInterface";
-import { UserBusinessLogic } from "../userServices/buisnessLogic";
+import { UserBusinessLogic } from "../userServices/businessLogic";
 
 const businessLogic = new UserBusinessLogic();
 
 export const userController = {
+
+
     addUser: async (req: Request, res: Response): Promise<void> => {
         const user: User = req.body;
         user.isAdmin = false;
         try {
-            const token: string = await businessLogic.registerUser(user);
+            const token: string = await businessLogic.userRegister(user);
             res.status(201).send({ token });
         } catch (error: any) {
             res.status(error.status || 500).send({ error: error.message || "Failed to add user" });

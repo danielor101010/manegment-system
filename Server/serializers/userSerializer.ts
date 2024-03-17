@@ -7,7 +7,8 @@ export const userSchema = Joi.object({
     phone: Joi.string().required(),
     address: Joi.string().required(),
     city: Joi.string().required(),
-    isAdmin: Joi.boolean()
+    isAdmin: Joi.boolean(),
+    job: Joi.string()
 });
 
 

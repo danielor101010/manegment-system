@@ -8,6 +8,7 @@ interface User {
     address: string;
     city: string;
     isAdmin?: boolean;
+    job?: string;
   }
   
   export default User;

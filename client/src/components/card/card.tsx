@@ -29,7 +29,7 @@ function CardComponent({ user }: CardProps) {
                         {user.username}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {user.email}
+                        {user.job}
                     </Typography>
                 </CardContent>
                 <CardActions>
